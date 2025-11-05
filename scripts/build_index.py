@@ -6,7 +6,7 @@ from langchain_chroma import Chroma
 
 # === Загрузка документов ===
 docs = []
-knowledge_dir = "knowledge_base/final"
+knowledge_dir = "../knowledge_base/final"
 
 for filename in os.listdir(knowledge_dir):
     if filename.endswith(".txt"):
