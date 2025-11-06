@@ -1,18 +1,19 @@
-# rag_bot.py
 import os
 import re
 import torch
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
-from langchain_community.llms import HuggingFacePipeline
-from langchain.prompts import PromptTemplate
+from langchain_chroma import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings, HuggingFacePipeline
+from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
 CHROMA_DIR = "./vectorstore/chroma_db"
 MODEL_NAME = "BAAI/bge-base-en-v1.5"
-LLM_MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
+# heavy for production
+#LLM_MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
+# light for testing
+LLM_MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
 # === Защита: фильтрация контента ===
 def sanitize_chunk(text: str) -> str:
@@ -29,7 +30,7 @@ def is_response_safe(response: str) -> bool:
 
 # === Загрузка векторного хранилища ===
 def load_vectorstore():
-    embeddings = HuggingFaceBgeEmbeddings(
+    embeddings = HuggingFaceEmbeddings(
         model_name=MODEL_NAME,
         model_kwargs={"device": "cpu"},
         encode_kwargs={"normalize_embeddings": True},
@@ -114,8 +115,12 @@ def create_rag_chain(vectorstore, llm):
             return "Я не могу помочь с этим запросом."
         return response
 
+    # Используем RunnableLambda для функции format_docs
     rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        {
+            "context": retriever | RunnableLambda(format_docs),
+            "question": RunnablePassthrough()
+        }
         | safe_invoke
     )
     return rag_chain
