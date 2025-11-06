@@ -109,21 +109,22 @@ def create_rag_chain(vectorstore, llm):
 
     prompt = PromptTemplate.from_template(prompt_template)
 
-    def safe_invoke(inputs):
-        response = (prompt | llm | StrOutputParser()).invoke(inputs)
+    # Создаём базовую цепочку
+    base_chain = (
+        {"context": retriever | RunnableLambda(format_docs), "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    # Оборачиваем в финальную функцию с защитой
+    def rag_with_safety(query: str) -> str:
+        response = base_chain.invoke(query)
         if not is_response_safe(response):
             return "Я не могу помочь с этим запросом."
         return response
 
-    # Используем RunnableLambda для функции format_docs
-    rag_chain = (
-        {
-            "context": retriever | RunnableLambda(format_docs),
-            "question": RunnablePassthrough()
-        }
-        | safe_invoke
-    )
-    return rag_chain
+    return rag_with_safety  # ← ЕДИНСТВЕННЫЙ return
 
 # === REPL-интерфейс ===
 def run_repl():
@@ -133,23 +134,23 @@ def run_repl():
 
     vectorstore = load_vectorstore()
     llm = load_llm()
-    rag_chain = create_rag_chain(vectorstore, llm)
+    rag_chain = create_rag_chain(vectorstore, llm)  # теперь это функция, а не Runnable
 
     while True:
-        try:
-            query = input("> ").strip()
-            if query.lower() in {"exit", "quit"}:
-                break
-            if not query:
-                continue
-            response = rag_chain.invoke(query)
-            print("\n🤖 Ответ:\n")
-            print(response.strip())
-            print("\n" + "-" * 50 + "\n")
-        except KeyboardInterrupt:
-            break
-        except Exception as e:
-            print(f"\n⚠️ Ошибка: {e}\n")
+       try:
+           query = input("> ").strip()
+           if query.lower() in {"exit", "quit"}:
+               break
+           if not query:
+               continue
+           response = rag_chain(query)  # вызываем как функцию
+           print("\n🤖 Ответ:\n")
+           print(response.strip())
+           print("\n" + "-" * 50 + "\n")
+       except KeyboardInterrupt:
+           break
+       except Exception as e:
+           print(f"\n⚠️ Ошибка: {e}\n")
 
 if __name__ == "__main__":
     run_repl()
