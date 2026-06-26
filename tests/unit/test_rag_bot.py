@@ -224,6 +224,7 @@ class TestPatterns:
 
     def test_sensitive_patterns_are_valid_regex(self):
         """All sensitive patterns should be valid regex."""
+        import re
         for pattern in SENSITIVE_PATTERNS:
             try:
                 re_compiled = __import__("re").compile(pattern)
