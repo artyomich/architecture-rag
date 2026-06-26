@@ -6,7 +6,7 @@ import sys
 import tempfile
 from unittest.mock import MagicMock, patch, mock_open
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
 
 
 class TestBuildIndexPaths:

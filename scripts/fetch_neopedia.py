@@ -1,7 +1,11 @@
 import requests
 import os
 import time
+import sys
 from urllib.parse import quote
+
+# Добавляем текущую директорию в путь для импорта
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 API_URL = "https://neopedia.fandom.com/ru/api.php"
 
@@ -34,7 +38,12 @@ def html_to_text(html):
 
 def main():
     from articles_list import ARTICLES
-    os.makedirs("../knowledge_base/raw", exist_ok=True)
+    
+    # Используем абсолютные пути на основе расположения скрипта
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(base_dir)
+    output_dir = os.path.join(project_root, "knowledge_base", "raw")
+    os.makedirs(output_dir, exist_ok=True)
 
     for title in ARTICLES:
         print(f"📥 Загружаю: {title}")
@@ -42,7 +51,8 @@ def main():
         if html:
             text = html_to_text(html)
             safe_title = title.replace("/", "_").replace("\\", "_")
-            with open(f"../knowledge_base/raw/{safe_title}.txt", "w", encoding="utf-8") as f:
+            output_path = os.path.join(output_dir, f"{safe_title}.txt")
+            with open(output_path, "w", encoding="utf-8") as f:
                 f.write(text)
         time.sleep(0.4)
 

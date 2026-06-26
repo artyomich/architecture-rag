@@ -6,7 +6,7 @@ import sys
 import os
 
 # Add scripts to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
 
 from rag_bot import (
     sanitize_chunk,

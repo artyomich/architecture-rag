@@ -11,7 +11,9 @@ from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 
 # === Загрузка векторного хранилища ===
-CHROMA_DIR = "./vectorstore/chroma_db"
+# Используем абсолютные пути на основе расположения скрипта
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CHROMA_DIR = os.path.join(BASE_DIR, "vectorstore", "chroma_db")
 MODEL_NAME = "BAAI/bge-base-en-v1.5"
 
 embeddings = HuggingFaceEmbeddings(
