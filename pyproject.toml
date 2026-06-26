@@ -12,6 +12,10 @@ addopts = [
     "--ignore=tests/integration",
 ]
 
+[tool.pyright]
+extraPaths = ["scripts"]
+reportMissingImports = true
+
 [tool.coverage.run]
 source = ["scripts"]
 omit = [
