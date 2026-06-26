@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  rag-bot:
+    build: .
+    container_name: architecture-rag
+    volumes:
+      - ./scripts/vectorstore:/app/scripts/vectorstore
+      - ./knowledge_base:/app/knowledge_base
+    environment:
+      - HF_HOME=/tmp/hf_home
+    tmpfs:
+      - /tmp
