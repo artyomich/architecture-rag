@@ -1,0 +1,34 @@
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+pythonpath = ["scripts"]
+addopts = [
+    "-v",
+    "-ra",
+    "--strict-markers",
+    "--ignore=tests/integration",
+]
+
+[tool.pyright]
+extraPaths = ["scripts"]
+reportMissingImports = true
+
+[tool.coverage.run]
+source = ["scripts"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/vectorstore/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.",
+    "raise NotImplementedError",
+    "except ImportError",
+]
